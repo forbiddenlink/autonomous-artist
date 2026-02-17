@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Documentation (not needed in container)
+*.md
+!README.md
+
+# Test files
+tests/
+test_*.py
+*_test.py
+
+# CI/CD
+.github/
+
+# Logs (will be mounted as volume)
+logs/
+*.log
+
+# Cache (will be mounted as volume)
+cache/
+
+# Generated images (will be mounted as volume)
+static/generations/
+
+# History
+.history/
+
+# Environment files (will be passed as env vars)
+.env
+.env.*

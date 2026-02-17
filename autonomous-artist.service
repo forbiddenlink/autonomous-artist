@@ -1,0 +1,45 @@
+[Unit]
+Description=Autonomous Artist Flask Application
+After=network.target
+
+[Service]
+Type=notify
+User=artist
+Group=artist
+WorkingDirectory=/opt/autonomous-artist
+Environment="PATH=/opt/autonomous-artist/.venv/bin"
+EnvironmentFile=/opt/autonomous-artist/.env
+ExecStart=/opt/autonomous-artist/.venv/bin/gunicorn \
+    --bind 0.0.0.0:5001 \
+    --workers 4 \
+    --threads 2 \
+    --timeout 120 \
+    --access-logfile /var/log/autonomous-artist/access.log \
+    --error-logfile /var/log/autonomous-artist/error.log \
+    --log-level info \
+    --capture-output \
+    app:app
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitInterval=0
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/autonomous-artist/static /opt/autonomous-artist/cache /opt/autonomous-artist/logs /var/log/autonomous-artist
+
+# Resource limits
+LimitNOFILE=65536
+MemoryLimit=2G
+CPUQuota=200%
+
+# Health check
+ExecStartPre=/bin/sleep 5
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

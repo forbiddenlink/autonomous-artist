@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments  
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment variables (CRITICAL - contains secrets)
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Artist data
+artist_memory.json
+artist_memory.json.backup
+
+# Generated content
+static/generations/*
+!static/generations/.gitkeep
+cache/
+*.png
+*.jpg
+*.jpeg
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# History (if using history plugin)
+.history/
+
+# Temporary files
+*.tmp
+*.temp
+.cache
+
+# Ignore vscode AI rules
+.github/instructions/codacy.instructions.md

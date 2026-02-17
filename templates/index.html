@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aria | Autonomous Artist</title>
+    <link rel="icon" type="image/jpeg" href="/static/generations/painting_1768583627.jpg">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-panel: #141414;
+            --text-main: #e0e0e0;
+            --text-muted: #888888;
+            --accent: #bb86fc;
+            --accent-glow: rgba(187, 134, 252, 0.2);
+            --border: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- LEFT PANEL: THE MIND --- */
+        .mind-panel {
+            width: 450px;
+            background-color: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            z-index: 10;
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                height: auto;
+                overflow: auto;
+            }
+
+            .mind-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+            }
+
+            .gallery-panel {
+                overflow-y: visible;
+            }
+
+            .masonry-grid {
+                column-count: 1 !important;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mind-panel {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.7rem;
+            }
+
+            .mood-container {
+                padding: 1rem;
+            }
+
+            .orb {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        header {
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-family: 'Space Mono', monospace;
+            font-size: 2rem;
+            margin: 0;
+            letter-spacing: -1px;
+            background: linear-gradient(45deg, #fff, var(--accent));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-family: 'Space Mono', monospace;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Mood Orb */
+        .mood-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .orb {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 30px var(--accent-glow);
+            transition: all 1s ease;
+            position: relative;
+        }
+
+        .orb::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            background: inherit;
+            filter: blur(10px);
+            opacity: 0.5;
+            z-index: -1;
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.3;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+        }
+
+        .mood-info {
+            flex: 1;
+        }
+
+        .mood-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .mood-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-family: 'Space Mono', monospace;
+            font-size: 1.1rem;
+        }
+
+        /* Scrollable Stream */
+        .stream-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 2rem;
+            padding-right: 0.5rem;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+
+        /* Custom Scrollbar */
+        .stream-container::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .stream-container::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .log-entry {
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .log-meta {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent);
+            margin-bottom: 0.2rem;
+            opacity: 0.7;
+        }
+
+        .log-content {
+            color: #ccc;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            background: var(--text-main);
+            color: #000;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Space Mono', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+            flex: 1;
+        }
+
+        button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-main);
+        }
+
+        /* --- RIGHT PANEL: GALLERY --- */
+        .gallery-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background: radial-gradient(circle at top right, #1a1a1a, #0a0a0a);
+        }
+
+        .masonry-grid {
+            column-count: 3;
+            column-gap: 1.5rem;
+        }
+
+        @media (max-width: 1400px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .masonry-grid {
+                column-count: 1;
+            }
+        }
+
+        .art-card {
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
+            background: var(--bg-panel);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .art-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .art-img {
+            width: 100%;
+            display: block;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .art-info {
+            padding: 1.2rem;
+        }
+
+        .art-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .art-prompt {
+            font-size: 0.9rem;
+            color: #ddd;
+            display: -webkit-box;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .art-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .art-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.75rem;
+            font-family: 'Space Mono', monospace;
+        }
+
+        .art-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+        }
+
+        .cache-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(187, 134, 252, 0.9);
+            color: #000;
+            font-size: 0.6rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Space Mono';
+            font-weight: bold;
+        }
+
+        /* Thinking & Critique Section */
+        .thinking-section {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .thinking-header {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .thinking-icon {
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .thinking-content {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            white-space: pre-wrap;
+        }
+
+        .critique-dialogue {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .critique-entry {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .critique-speaker {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .critique-text {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        .artist-response {
+            margin-top: 0.5rem;
+            padding: 0.75rem;
+            background: rgba(187, 134, 252, 0.1);
+            border-radius: 6px;
+            border-left: 2px solid rgba(187, 134, 252, 0.5);
+        }
+
+        .response-label {
+            font-size: 0.7rem;
+            color: var(--accent);
+            font-family: 'Space Mono', monospace;
+            margin-bottom: 0.3rem;
+        }
+
+        .response-text {
+            font-size: 0.8rem;
+            color: var(--text-main);
+        }
+
+        .approval-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-family: 'Space Mono', monospace;
+            margin-left: 0.5rem;
+        }
+
+        .approved {
+            background: rgba(0, 255, 100, 0.2);
+            color: #00ff64;
+        }
+
+        .revised {
+            background: rgba(255, 200, 0, 0.2);
+            color: #ffc800;
+        }
+
+        .rebelled {
+            background: rgba(255, 50, 100, 0.2);
+            color: #ff3264;
+        }
+
+        .tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+
+        /* Loading Overlay */
+        #painting-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        #painting-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .loader {
+            color: var(--accent);
+            font-family: 'Space Mono', monospace;
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            animation: pulseText 1.5s infinite;
+        }
+
+        @keyframes pulseText {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LEFT PANEL: MIND -->
+    <div class="mind-panel">
+        <header>
+            <h1>ARIA</h1>
+            <div class="subtitle">Autonomous Artificial Artist</div>
+        </header>
+
+        <!-- Dynamic Mood Orb -->
+        <div class="mood-container">
+            <div id="mood-orb" class="orb"></div>
+            <div class="mood-info">
+                <div class="mood-label">Current State</div>
+                <div id="mood-text" class="mood-value">Awakening...</div>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">ENERGY LEVEL</div>
+                <div id="energy-val" class="stat-value">--%</div>
+            </div>
+            <!-- Total Works removed -->
+        </div>
+
+        <div style="margin-bottom: 1rem; font-family:'Space Mono'; font-size:0.8rem; color:var(--text-muted);">STREAM OF
+            CONSCIOUSNESS</div>
+        <div id="thought-stream" class="stream-container">
+            <!-- Logs go here -->
+            <div class="log-entry">
+                <div class="log-meta">SYSTEM</div>
+                <div class="log-content">Neural pathways initializing... History loaded.</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="paint-btn" onclick="triggerPaint()">PAINT NEXT PIECE</button>
+            <button id="view-statement" class="btn-outline" onclick="showStatement()"
+                title="Read Artist Statement">?</button>
+        </div>
+        
+        <div class="controls" style="margin-top: 1rem;">
+            <button class="btn-outline" onclick="downloadPortfolio()" title="Download all artworks as ZIP">
+                📦 EXPORT ALL
+            </button>
+            <button class="btn-outline" onclick="showCacheStats()" title="View cache statistics">
+                💾 CACHE
+            </button>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: THE GALLERY -->
+    <div class="gallery-panel">
+        <div id="gallery-grid" class="masonry-grid">
+            <!-- Art cards injected here -->
+        </div>
+    </div>
+
+    <!-- OVERLAYS -->
+    <div id="painting-overlay">
+        <div style="text-align: center;">
+            <div class="loader" id="loader-text">DREAMING...</div>
+            <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted); font-family: 'Space Mono';" id="loader-status">Generating artwork</div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentPaintingCount = 0;
+
+        // ... (previous state vars)
+
+        function openLightboxById(paintingNumber) {
+            const painting = window.paintingsData[paintingNumber];
+            if (painting) {
+                openLightbox(painting);
+            }
+        }
+
+        function openLightbox(painting) {
+            const lb = document.getElementById('lightbox');
+            const img = document.getElementById('lb-img');
+            const title = document.getElementById('lb-title');
+            const tags = document.getElementById('lb-tags');
+            const reflection = document.getElementById('lb-reflection');
+            const thinkingSection = document.getElementById('lb-thinking');
+            const thinkingContent = document.getElementById('lb-thinking-content');
+            const critiqueSection = document.getElementById('lb-critique');
+            const critiqueContent = document.getElementById('lb-critique-content');
+
+            let imgSrc = painting.image_url;
+            if (!imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
+                imgSrc = '/' + imgSrc;
+            }
+
+            img.src = imgSrc;
+            title.textContent = painting.subject;
+            reflection.textContent = painting.reflection || painting.prompt || "No reflection recorded.";
+
+            tags.innerHTML = `
+                <span class="tag" style="background:${MOOD_COLORS[painting.mood]}33; color:${MOOD_COLORS[painting.mood]}">${painting.mood}</span>
+                <span class="tag">${painting.style}</span>
+            `;
+
+            // Display thinking process if available
+            if (painting.thinking && painting.thinking.narrative) {
+                thinkingContent.textContent = painting.thinking.narrative;
+                thinkingSection.style.display = 'block';
+            } else {
+                thinkingSection.style.display = 'none';
+            }
+
+            // Display critique dialogue if available
+            if (painting.critique_history && painting.critique_history.length > 0) {
+                let critiqueHTML = '';
+                painting.critique_history.forEach((critique, index) => {
+                    const statusBadge = critique.approved ? 
+                        '<span class="approval-badge approved">✓ APPROVED</span>' : 
+                        '<span class="approval-badge revised">⚠ REVISION SUGGESTED</span>';
+                    
+                    critiqueHTML += `
+                        <div class="critique-entry">
+                            <div class="critique-speaker">
+                                ${critique.critic_name} ${statusBadge}
+                            </div>
+                            <div class="critique-text">${critique.critique}</div>
+                            ${critique.artist_response ? `
+                                <div class="artist-response">
+                                    <div class="response-label">
+                                        ARTIST'S RESPONSE
+                                        ${critique.artist_response.rebels ? 
+                                            '<span class="approval-badge rebelled">🔥 REBELLED</span>' : ''}
+                                    </div>
+                                    <div class="response-text">${critique.artist_response.reasoning}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+                critiqueContent.innerHTML = critiqueHTML;
+                critiqueSection.style.display = 'block';
+            } else {
+                critiqueSection.style.display = 'none';
+            }
+
+            lb.classList.add('active');
+        }
+
+        function closeLightbox(e) {
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('active');
+            setTimeout(() => {
+                document.getElementById('lb-img').src = '';
+            }, 300);
+        }
+
+        // Color map for moods
+        const MOOD_COLORS = {
+            "contemplative": "#7B8FA1", // Muted Blue
+            "energized": "#FFD93D",     // Yellow
+            "melancholic": "#4B56D2",   // Deep Blue
+            "chaotic": "#FF6B6B",       // Red
+            "serene": "#A8D1D1",        // Soft Teal
+            "restless": "#FF8E4F",      // Orange
+            "nostalgic": "#D4AC8D",     // Sepia
+            "curious": "#9376E0",       // Purple
+            "introspective": "#5F6F94", // Slate
+            "rebellious": "#FF0032",    // Bright Red
+            "dreamy": "#F3CCFF",        // Pinkish
+            "focused": "#FFFFFF",       // White
+            "whimsical": "#F7A4A4",     // Pink
+            "gothic": "#2C3333",        // Dark
+            "cyberpunk": "#00FFDD"      // Cyan
+        };
+
+        function addLog(source, text) {
+            const stream = document.getElementById('thought-stream');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <div class="log-meta">${source} • ${new Date().toLocaleTimeString()}</div>
+                <div class="log-content">${text}</div>
+            `;
+            stream.insertBefore(entry, stream.firstChild);
+        }
+
+        async function fetchState(loadGallery = false) {
+            try {
+                const res = await fetch('/api/latest');
+                const data = await res.json();
+                updateUI(data);
+
+                if (loadGallery) {
+                    renderGallery(data.state.portfolio); // Simulated access to full portfolio
+                }
+            } catch (e) {
+                console.error("Connection lost", e);
+            }
+        }
+
+        function updateUI(data) {
+            // Update Mood components
+            const mood = data.state.mood;
+            const color = MOOD_COLORS[mood] || '#bb86fc';
+
+            document.getElementById('mood-text').textContent = mood;
+            const orb = document.getElementById('mood-orb');
+            orb.style.backgroundColor = color;
+            orb.style.boxShadow = `0 0 30px ${color}66`; // Add alpha to glow
+
+            document.getElementById('energy-val').textContent = Math.round(data.state.energy * 100) + '%';
+            // document.getElementById('count-val').textContent = data.state.paintings_created;
+
+            // If new painting arrived
+            if (data.state.paintings_created > currentPaintingCount) {
+                if (currentPaintingCount > 0) {
+                    addLog('REFLECTION', `"${data.latest_painting.reflection}"`);
+                }
+                currentPaintingCount = data.state.paintings_created;
+            }
+        }
+
+        function createArtCard(painting) {
+            const div = document.createElement('div');
+            div.className = 'art-card';
+
+            // Logic to determine image source and fallback
+            let imgSrc = painting.image_url;
+            let isConcept = false;
+
+            // Check for failed generations or placeholders
+            if (!imgSrc || imgSrc.includes('generation_failed') || imgSrc === 'placeholder.jpg') {
+                imgSrc = 'https://placehold.co/600x400/1a1a1a/666?text=Mental+Image';
+                isConcept = true;
+            } else if (imgSrc.startsWith('painting_') || imgSrc.startsWith('generation_')) {
+                // Old format without path - add static/generations/
+                imgSrc = '/static/generations/' + imgSrc;
+            } else if (!imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
+                // Fix local paths if they don't have leading slash
+                imgSrc = '/' + imgSrc;
+            }
+
+            const cacheBadge = painting.from_cache ? '<div class="cache-badge">⚡ CACHED</div>' : '';
+            
+            // Store painting data in a global map for lightbox access
+            if (!window.paintingsData) window.paintingsData = {};
+            window.paintingsData[painting.number] = painting;
+
+            div.innerHTML = `
+                <div style="position:relative; width:100%; min-height:200px; background:#1a1a1a;">
+                    <img src="${imgSrc}" class="art-img" loading="lazy" 
+                        onerror="this.parentElement.parentElement.style.display='none';"
+                        onclick="openLightboxById(${painting.number})">
+                    ${cacheBadge}
+                    ${isConcept ? '<div style="position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.8); color:#bb86fc; font-size:0.6rem; padding:4px 8px; border-radius:4px; border:1px solid #333; font-family:\'Space Mono\'">CONCEPT ONLY</div>' : ''}
+                </div>
+                <div class="art-info">
+                    <div class="art-title">${painting.subject}</div>
+                    <div class="art-prompt">${painting.reflection || painting.prompt || ""}</div>
+                    <div class="tags">
+                        <span class="tag">${painting.style}</span>
+                        <span class="tag">${painting.mood}</span>
+                    </div>
+                    ${!isConcept ? `
+                    <div class="art-actions">
+                        <button class="art-btn" onclick="event.stopPropagation(); downloadPainting(${painting.number})">⬇ Download</button>
+                        <button class="art-btn" onclick="event.stopPropagation(); openLightboxById(${painting.number})">👁 View</button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            return div;
+        }
+
+        function renderGallery(portfolio) {
+            const grid = document.getElementById('gallery-grid');
+            if (!grid) {
+                console.error('Gallery grid element not found!');
+                return;
+            }
+            
+            grid.innerHTML = '';
+
+            // Filter only valid paintings
+            const validWorks = portfolio.filter(p => {
+                const url = p.image_url;
+                return url && !url.includes('generation_failed') && url !== 'placeholder.jpg';
+            });
+
+            // Show newest first
+            [...validWorks].reverse().forEach(p => {
+                grid.appendChild(createArtCard(p));
+            });
+        }
+
+        async function triggerPaint() {
+            const btn = document.getElementById('paint-btn');
+            const overlay = document.getElementById('painting-overlay');
+            const loaderText = document.getElementById('loader-text');
+            const loaderStatus = document.getElementById('loader-status');
+
+            overlay.classList.add('active');
+            btn.disabled = true;
+            addLog('SYSTEM', 'Initiating creative process...');
+
+            // Simulate progress updates
+            const progressSteps = [
+                'Contemplating subject...',
+                'Mixing digital pigments...',
+                'Applying brushstrokes...',
+                'Adding details...',
+                'Finalizing composition...'
+            ];
+
+            let stepIndex = 0;
+            const progressInterval = setInterval(() => {
+                if (stepIndex < progressSteps.length) {
+                    loaderStatus.textContent = progressSteps[stepIndex];
+                    stepIndex++;
+                }
+            }, 2000);
+
+            try {
+                const res = await fetch('/api/paint', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ use_critique: true })
+                });
+                const data = await res.json();
+
+                clearInterval(progressInterval);
+
+                if (data.success) {
+                    // Display thinking process
+                    if (data.thinking) {
+                        addLog('ARTIST THINKING', data.thinking);
+                    }
+
+                    // Display critique dialogue
+                    if (data.critique_history && data.critique_history.length > 0) {
+                        data.critique_history.forEach((critique, index) => {
+                            const critiqueLog = `
+                                Iteration ${index + 1}:
+                                ${critique.critic_name}: "${critique.critique}"
+                                ${critique.approved ? '✓ Approved' : '⚠ Suggested revision'}
+                                ${critique.artist_response ? `\nArtist: "${critique.artist_response.reasoning}"` : ''}
+                            `;
+                            addLog('CRITIQUE', critiqueLog);
+                        });
+                    }
+
+                    addLog('ARIA', data.reflection);
+                    addLog('SYSTEM', `Painting #${data.number} complete.`);
+
+                    // Fetch latest state and update gallery
+                    const stateRes = await fetch('/api/latest');
+                    const stateData = await stateRes.json();
+                    updateUI(stateData);
+                    setTimeout(() => renderGallery(stateData.state.portfolio || []), 300);
+                } else {
+                    addLog('ERROR', data.error || 'Failed to create painting.');
+                }
+            } catch (err) {
+                clearInterval(progressInterval);
+                addLog('ERROR', 'Network error: ' + err.message);
+            } finally {
+                overlay.classList.remove('active');
+                btn.disabled = false;
+            }
+        }
+
+        async function downloadPainting(paintingNumber) {
+            try {
+                addLog('SYSTEM', `Downloading painting #${paintingNumber}...`);
+                window.location.href = `/api/download/${paintingNumber}`;
+            } catch (e) {
+                console.error('Download failed:', e);
+                addLog('ERROR', 'Download failed.');
+            }
+        }
+
+        async function downloadPortfolio() {
+            try {
+                const btn = event.target;
+                btn.disabled = true;
+                btn.textContent = '⏳ CREATING ZIP...';
+                
+                addLog('SYSTEM', 'Preparing portfolio archive...');
+                
+                // Give UI time to update
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                window.location.href = '/api/download/portfolio';
+                
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.textContent = '📦 EXPORT ALL';
+                    addLog('SYSTEM', 'Portfolio download started.');
+                }, 2000);
+            } catch (e) {
+                console.error('Portfolio download failed:', e);
+                addLog('ERROR', 'Portfolio export failed.');
+                event.target.disabled = false;
+                event.target.textContent = '📦 EXPORT ALL';
+            }
+        }
+
+        async function showCacheStats() {
+            try {
+                const res = await fetch('/api/cache/stats');
+                const stats = await res.json();
+
+                const modal = document.createElement('div');
+                modal.className = 'statement-modal';
+                modal.innerHTML = `
+                    <div class="statement-content">
+                        <button class="statement-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+                        <h2>Cache Statistics</h2>
+                        <div style="font-family: 'Space Mono'; color: #ddd;">
+                            <p>💾 Image Entries: <strong>${stats.image_entries}</strong></p>
+                            <p>📝 Text Entries: <strong>${stats.text_entries}</strong></p>
+                            <p>📊 Total Size: <strong>${stats.total_size_mb} MB</strong></p>
+                            <p style="margin-top: 1.5rem; color: var(--text-muted); font-size: 0.85rem;">
+                                Caching saves API costs and speeds up repeated generations.
+                            </p>
+                        </div>
+                        <button onclick="clearExpiredCache()" style="margin-top: 1.5rem; width: 100%;" class="btn-outline">
+                            🗑️ Clear Expired Entries
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (e) {
+                console.error('Failed to fetch cache stats:', e);
+                addLog('ERROR', 'Could not retrieve cache statistics.');
+            }
+        }
+
+        async function clearExpiredCache() {
+            try {
+                const res = await fetch('/api/cache/clear', { method: 'POST' });
+                const data = await res.json();
+                addLog('SYSTEM', `Cleared ${data.cleared} expired cache entries.`);
+                
+                // Close modal and refresh stats
+                document.querySelector('.statement-modal')?.remove();
+            } catch (e) {
+                console.error('Failed to clear cache:', e);
+                addLog('ERROR', 'Could not clear cache.');
+            }
+        }
+
+        async function showStatement() {
+            const btn = document.getElementById('view-statement');
+            btn.disabled = true;
+            btn.textContent = '...';
+
+            try {
+                const res = await fetch('/api/statement');
+                const data = await res.json();
+
+                // Create and show modal
+                const modal = document.createElement('div');
+                modal.className = 'statement-modal';
+                modal.innerHTML = `
+                    <div class="statement-content">
+                        <button class="statement-close" onclick="this.parentElement.parentElement.remove()">&times;</button>
+                        <h2>Artist Statement</h2>
+                        <p class="statement-text">${data.statement || 'I am still finding my words...'}</p>
+                        <div class="statement-meta">— Aria, Autonomous Artist</div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+
+                // Add modal styles if not present
+                if (!document.getElementById('statement-styles')) {
+                    const style = document.createElement('style');
+                    style.id = 'statement-styles';
+                    style.textContent = `
+                        .statement-modal {
+                            position: fixed;
+                            inset: 0;
+                            background: rgba(0,0,0,0.9);
+                            backdrop-filter: blur(10px);
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            z-index: 2000;
+                            animation: fadeIn 0.3s ease;
+                        }
+                        .statement-content {
+                            background: var(--bg-panel);
+                            border: 1px solid var(--border);
+                            border-radius: 16px;
+                            padding: 3rem;
+                            max-width: 600px;
+                            position: relative;
+                        }
+                        .statement-content h2 {
+                            font-family: 'Space Mono', monospace;
+                            color: var(--accent);
+                            margin-top: 0;
+                            font-size: 0.9rem;
+                            text-transform: uppercase;
+                            letter-spacing: 3px;
+                        }
+                        .statement-text {
+                            font-size: 1.2rem;
+                            line-height: 1.8;
+                            color: #ddd;
+                            font-style: italic;
+                        }
+                        .statement-meta {
+                            margin-top: 2rem;
+                            color: var(--text-muted);
+                            font-size: 0.9rem;
+                        }
+                        .statement-close {
+                            position: absolute;
+                            top: 1rem;
+                            right: 1rem;
+                            background: none;
+                            border: none;
+                            color: #888;
+                            font-size: 1.5rem;
+                            cursor: pointer;
+                        }
+                        .statement-close:hover { color: #fff; }
+                    `;
+                    document.head.appendChild(style);
+                }
+            } catch (e) {
+                console.error('Failed to fetch statement:', e);
+                alert('Could not retrieve artist statement. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '?';
+            }
+        }
+
+        // Init
+        // We need the full history. The /api/latest endpoint in app.py actually returns:
+        // { state: ..., latest_painting: ... } 
+        // We might need to modify app.py to send the full portfolio or fetch it separately. 
+        // For this demo, let's assume valid data flows or we might need a small patch to app.py
+
+        // Let's patching fetchState to actually work with the existing API structure
+        // app.py: get_latest_state() -> return jsonify({"state": artist.get_current_state(), "latest_painting": ...})
+        // artist.get_current_state() does NOT include the full portfolio list usually.
+        // We'll need to FIX THIS in the next step if strictly needed, but let's see what we can do.
+
+        // Actually, let's try to fetch the data.
+
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOM loaded, initializing...');
+            
+            // Verify critical elements exist
+            const grid = document.getElementById('gallery-grid');
+            const btn = document.getElementById('paint-btn');
+            console.log('Gallery grid found:', !!grid);
+            console.log('Paint button found:', !!btn);
+            
+            // Load full gallery on startup
+            await fetchState(true);
+            
+            // Poll for updates every 5 seconds
+            setInterval(() => fetchState(false), 5000);
+        });
+
+    </script>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <button class="close-btn" onclick="closeLightbox()">&times;</button>
+            <div class="lightbox-body">
+                <div class="lightbox-img-container">
+                    <img id="lb-img" src="" alt="Artwork">
+                </div>
+                <div class="lightbox-details">
+                    <h2 id="lb-title"></h2>
+                    <div class="tags" id="lb-tags"></div>
+                    <div class="lb-meta">
+                        <div class="lb-label">REFLECTION</div>
+                        <p id="lb-reflection"></p>
+                    </div>
+                    <!-- Thinking Section -->
+                    <div id="lb-thinking" class="thinking-section" style="display:none;">
+                        <div class="thinking-header">
+                            <div class="thinking-icon"></div>
+                            ARTIST'S THOUGHT PROCESS
+                        </div>
+                        <div id="lb-thinking-content" class="thinking-content"></div>
+                    </div>
+                    <!-- Critique Dialogue -->
+                    <div id="lb-critique" class="thinking-section" style="display:none;">
+                        <div class="thinking-header">
+                            <div class="thinking-icon"></div>
+                            CREATIVE DIALOGUE
+                        </div>
+                        <div id="lb-critique-content" class="critique-dialogue"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Lightbox Styles */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 2rem;
+        }
+
+        .lightbox.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .lightbox-content {
+            background: var(--bg-panel);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .lightbox.active .lightbox-content {
+            transform: scale(1);
+        }
+
+        .lightbox-body {
+            display: flex;
+            width: 100%;
+        }
+
+        .lightbox-img-container {
+            flex: 1.5;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .lightbox-img-container img {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-details {
+            flex: 1;
+            padding: 3rem;
+            overflow-y: auto;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            z-index: 10;
+            padding: 0.5rem;
+            line-height: 1;
+        }
+
+        #lb-title {
+            font-family: 'Space Mono', monospace;
+            font-size: 2rem;
+            margin-top: 0;
+            text-transform: capitalize;
+            color: #fff;
+        }
+
+        .lb-meta {
+            margin-top: 2rem;
+        }
+
+        .lb-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        #lb-reflection {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #ddd;
+        }
+
+        @media (max-width: 900px) {
+            .lightbox-body {
+                flex-direction: column;
+            }
+
+            .lightbox-img-container {
+                padding: 0;
+            }
+
+            .lightbox-details {
+                padding: 1.5rem;
+            }
+
+            .lightbox-content {
+                flex-direction: column;
+                height: auto;
+                max-height: 95vh;
+                overflow-y: auto;
+            }
+
+            .lightbox-img-container img {
+                max-height: 50vh;
+            }
+        }
+    </style>
+</body>
+
+</html>
