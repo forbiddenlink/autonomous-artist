@@ -8,5 +8,5 @@ huggingface_hub>=1.19.0
 Pillow>=12.2.0
 pytest>=9.1.0
 pydantic>=2.13.4
-pydantic-settings>=2.14.1
+pydantic-settings>=2.14.2
 gunicorn>=26.0.0
