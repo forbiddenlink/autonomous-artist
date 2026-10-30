@@ -392,10 +392,10 @@ Monitor for:
 ## Additional Resources
 
 ### Documentation
-- [README.md](README.md) - Getting started
-- [API.md](API.md) - API documentation
-- [SECURITY.md](SECURITY.md) - Security guide
-- [QUICKSTART.md](QUICKSTART.md) - Quick start guide
+- [README.md](../README.md) - Getting started
+- [API.md](../API.md) - API documentation
+- [SECURITY.md](../SECURITY.md) - Security guide
+- [QUICKSTART.md](../QUICKSTART.md) - Quick start guide
 
 ### External Resources
 - [OWASP Top 10](https://owasp.org/www-project-top-ten/)

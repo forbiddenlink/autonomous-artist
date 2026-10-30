@@ -439,8 +439,8 @@ The application has successfully passed all manual and automated testing. It dem
 
 **Next Steps**:
 1. Deploy with Gunicorn: `gunicorn -w 4 -b 0.0.0.0:5001 app:app`
-2. Configure Nginx reverse proxy (see [DEPLOYMENT.md](DEPLOYMENT.md))
-3. Set up monitoring (see [MONITORING.md](MONITORING.md))
+2. Configure Nginx reverse proxy (see [DEPLOYMENT.md](../DEPLOYMENT.md))
+3. Set up monitoring (see [MONITORING.md](../MONITORING.md))
 4. Configure environment variables for production
 
 ---
