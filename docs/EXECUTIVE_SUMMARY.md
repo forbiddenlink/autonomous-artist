@@ -273,9 +273,9 @@ Your **Autonomous Artist** application has been:
 
 1. **Review Documentation**
    - [FINAL_VALIDATION_REPORT.md](FINAL_VALIDATION_REPORT.md) - Complete validation
-   - [API.md](API.md) - API documentation
-   - [SECURITY.md](SECURITY.md) - Security guide
-   - [DEPLOYMENT.md](DEPLOYMENT.md) - Deployment guide
+   - [API.md](../API.md) - API documentation
+   - [SECURITY.md](../SECURITY.md) - Security guide
+   - [DEPLOYMENT.md](../DEPLOYMENT.md) - Deployment guide
 
 2. **Run Validations**
    ```bash
@@ -284,13 +284,13 @@ Your **Autonomous Artist** application has been:
    ```
 
 3. **Deploy to Production**
-   - Follow [DEPLOYMENT.md](DEPLOYMENT.md) guide
+   - Follow [DEPLOYMENT.md](../DEPLOYMENT.md) guide
    - Set environment variables
    - Configure SSL/HTTPS
    - Set up monitoring
 
 4. **Monitor Application**
-   - Follow [MONITORING.md](MONITORING.md) guide
+   - Follow [MONITORING.md](../MONITORING.md) guide
    - Set up Prometheus/Grafana
    - Configure alerting
 

@@ -319,9 +319,9 @@ gunicorn -w 4 -b 0.0.0.0:5001 app:app
 ## 📞 SUPPORT & RESOURCES
 
 ### Documentation:
-- [README.md](README.md) - Getting started
-- [API.md](API.md) - API reference
-- [SECURITY.md](SECURITY.md) - Security practices
+- [README.md](../README.md) - Getting started
+- [API.md](../API.md) - API reference
+- [SECURITY.md](../SECURITY.md) - Security practices
 - [AUDIT_REPORT.md](AUDIT_REPORT.md) - Detailed audit
 
 ### External Resources:

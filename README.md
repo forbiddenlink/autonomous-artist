@@ -1,5 +1,7 @@
 # Autonomous Artist - An AI That Paints What It Feels
 
+> **Successor project:** this work continued as [the-becoming](https://github.com/forbiddenlink/the-becoming). This repository is kept as the original version.
+
 An AI artist with genuine personality, evolving preferences, and autonomous decision-making. Watch as it develops its own artistic voice over time.
 
 ## What Makes This Special

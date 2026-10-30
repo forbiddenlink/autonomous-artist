@@ -8,7 +8,7 @@ This document details all the enhancements made to make the Autonomous Artist ap
 
 ### 1. Missing Mood Reference
 - **Issue**: The mood "anxious" was referenced in mood transitions but not in the MOODS list
-- **Fix**: Added "anxious" to the MOODS list in [brain.py](artist_modules/brain.py)
+- **Fix**: Added "anxious" to the MOODS list in [brain.py](../artist_modules/brain.py)
 - **Impact**: Prevents potential crashes when mood transitions try to use "anxious"
 
 ## 🔧 Major Enhancements
@@ -26,21 +26,21 @@ This document details all the enhancements made to make the Autonomous Artist ap
 - **Files Updated**: `app.py`, `autonomous_artist.py`, `utils.py`, `memory.py`
 
 ### 3. Configuration Management
-- **New File**: [config.py](config.py)
+- **New File**: [config.py](../config.py)
 - Centralized all configurable values
 - Environment-based configuration
 - Validation of configuration on startup
 - Easy to adjust settings without touching code
 
 ### 4. API Retry Logic with Exponential Backoff
-- **New Feature**: `retry_with_backoff` decorator in [utils.py](utils.py)
+- **New Feature**: `retry_with_backoff` decorator in [utils.py](../utils.py)
 - Automatically retries failed API calls
 - Exponential backoff prevents hammering failed services
 - Configurable retry attempts and delays
 - Improves reliability of image/text generation
 
 ### 5. Input Validation & Security
-- **New Functions**: `validate_prompt()`, `validate_image_path()` in [utils.py](utils.py)
+- **New Functions**: `validate_prompt()`, `validate_image_path()` in [utils.py](../utils.py)
 - Prevents injection attacks
 - Validates file paths to prevent directory traversal
 - Limits input sizes to prevent resource exhaustion
@@ -51,7 +51,7 @@ This document details all the enhancements made to make the Autonomous Artist ap
 - Prevents unbounded memory growth
 - Automatic cleanup of old entries
 - Better error handling in save/load operations
-- **File Updated**: [memory.py](artist_modules/memory.py)
+- **File Updated**: [memory.py](../artist_modules/memory.py)
 
 ### 7. Health Check Endpoint
 - **New Endpoint**: `GET /health`
@@ -61,14 +61,14 @@ This document details all the enhancements made to make the Autonomous Artist ap
 - Useful for monitoring and debugging
 
 ### 8. Comprehensive Test Suite
-- **New File**: [tests.py](tests.py)
+- **New File**: [tests.py](../tests.py)
 - Unit tests for all major components
 - Tests for configuration, brain, painter, memory, and artist
 - Input validation tests
 - Run with: `python -m pytest tests.py -v`
 
 ### 9. Environment Configuration Template
-- **New File**: [.env.example](.env.example)
+- **New File**: [.env.example](../.env.example)
 - Template for environment variables
 - Comprehensive documentation of all settings
 - Makes setup easier for new users
