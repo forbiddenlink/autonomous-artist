@@ -78,7 +78,7 @@ jobs:
 
       - name: Run unit tests
         run: |
-          pytest test_comprehensive.py -v --tb=short --junit-xml=test-results.xml
+          pytest test_comprehensive.py test_no_hardcoded_tokens.py -v --tb=short --junit-xml=test-results.xml
 
       - name: Upload test results
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7

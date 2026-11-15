@@ -1,6 +1,11 @@
+import os
+import sys
+
 import requests
 
-user_token = "EAARPkdFQtQkBQXlB9MMBbIoa5GByNLVh9wExZAWbeUo5GQgwwoB0gTrgJkfA8LeDZB5p7bzaMcNy5lujVGs15nJijP6eO4sx1YYs0LwDEg9YRZByUmpwAFcFjeFiUhLRPhe4j7NDuQDyZAQrHV269ZBt1fadtl3Dzsqi3rCxh0cT8laWhMnhiLuqaq8TZCJSKDPrZAT3Su0hRWzZBjBP4Yg2GzByOevs6pAZD"
+user_token = os.environ.get("FB_USER_TOKEN")
+if not user_token:
+    sys.exit("FB_USER_TOKEN is not set. Export it in your shell or .env before running this script.")
 
 print("🔄 Fetching your Facebook pages...")
 url = f"https://graph.facebook.com/v19.0/me/accounts?access_token={user_token}"
