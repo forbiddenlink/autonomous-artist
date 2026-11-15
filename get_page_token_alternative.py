@@ -1,7 +1,12 @@
+import os
+import sys
+
 import requests
 
 # Your user token with pages_show_list and business_management permissions
-user_token = "EAARPkdFQtQkBQdZAgEIwZAvQbxKGJmcFDPKHnLEnvhCnpTO0dZCee0b0cJyb4QTlGVFWTwFpZAKURU7WDyAah5l5jsrTt98AyKHtmj32aetjfn56tCNc8vPB2kt2FRgrHZBg06NJhBwMvSMI0nV89qOIBKxtyYo49njIM7GofsutGqyqIP6994ZBqyRESQJtjkgayIk5QY3YhpKQV0W7WKnBz0XdxzjsGbb1aOSC33NpllvPZC6nZAX221GugRXTYwczFCqyY8GJeAZDZD"
+user_token = os.environ.get("FB_USER_TOKEN")
+if not user_token:
+    sys.exit("FB_USER_TOKEN is not set. Export it in your shell or .env before running this script.")
 
 # Known page ID
 page_id = "993674647151431"
