@@ -1,3 +1,5 @@
+> Status as of 2026-11-15: historical report written on its stated date. Its results and "production ready" statements were not re-checked in this docs pass. This repository is kept as the original version; development continued in [the-becoming](https://github.com/forbiddenlink/the-becoming).
+
 # Manual Test Validation Report
 **Date**: February 6, 2026  
 **Tester**: GitHub Copilot (Automated Testing)  

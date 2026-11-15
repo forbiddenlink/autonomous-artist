@@ -196,12 +196,20 @@ Retrieve the artist's self-written statement about their work and philosophy.
 
 ---
 
-### 6. Get Full Portfolio
+### 6. Get portfolio
+
+**Endpoint**: `GET /api/portfolio`
+
+**Response**: JSON with `count` and the last 20 paintings in `paintings`.
+
+Other routes in `app.py` not described here: `POST /api/evolve`, `POST /api/share_latest`, `GET /api/download/<painting_number>`, `GET /api/export/json`, `GET /metrics`.
+
+#### Download the portfolio
 Download all paintings and metadata.
 
-**Endpoint**: `GET /api/portfolio/download`
+**Endpoint**: `GET /api/download/portfolio`
 
-**Rate Limit**: 10 requests/hour
+**Rate Limit**: app default (200/day, 50/hour per client)
 
 **Response**: ZIP file containing:
 - All generated images
@@ -231,7 +239,7 @@ Download all paintings and metadata.
 #### Clear Expired Cache
 **Endpoint**: `POST /api/cache/clear`
 
-**Rate Limit**: 10 requests/hour
+**Rate Limit**: app default (200/day, 50/hour per client)
 
 **Response** (200 OK):
 ```json
@@ -254,7 +262,7 @@ All endpoints are rate-limited to prevent abuse. Rate limits are per IP address.
 **Specific Limits**:
 - `/api/paint`: 10 requests/hour (expensive AI generation)
 - `/health`: 30 requests/minute (monitoring)
-- `/api/portfolio/download`: 10 requests/hour (large download)
+- `/metrics`: 60 requests/minute
 
 **Rate Limit Response** (429 Too Many Requests):
 ```json
@@ -409,7 +417,7 @@ curl -X POST http://localhost:5001/api/paint \
 curl http://localhost:5001/api/latest
 
 # Download portfolio
-curl -o portfolio.zip http://localhost:5001/api/portfolio/download
+curl -o portfolio.zip http://localhost:5001/api/download/portfolio
 ```
 
 ---
