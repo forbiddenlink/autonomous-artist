@@ -1,9 +1,9 @@
-# QUICK START GUIDE
+# Quick start
 
-## What You Built
+## What this is
 
-An autonomous AI artist that:
-- Has genuine moods and personality
+A simulated artist that:
+- Has moods and a personality profile
 - Makes its own creative decisions
 - Evolves preferences over time
 - Maintains memory of past work
@@ -13,7 +13,7 @@ An autonomous AI artist that:
 
 ```bash
 # Install dependencies
-pip install flask
+pip install -r requirements.txt
 
 # Run the interactive demo
 python3 showcase.py
@@ -29,6 +29,8 @@ python3 artist_cli.py
 - `artist_cli.py` - Command line interface
 - `demo.py` - Simple demonstration
 - `showcase.py` - Complete feature showcase
+- `artist_modules/` - brain, critic, memory and painter modules
+- `utils.py` and `config.py` - image calls and settings
 - `templates/index.html` - Web interface
 - `README.md` - Full documentation
 
@@ -46,12 +48,12 @@ python3 artist_cli.py
 
 # Web interface
 python3 app.py
-# Then visit: http://localhost:5000
+# Then visit: http://localhost:5001
 ```
 
 ## What Makes It Cool
 
-1. **Real Personality**: Each instance starts with unique preferences
+1. **Personality**: Each instance starts with unique preferences
 2. **Evolution**: Gets bored, shifts interests, changes moods
 3. **Memory**: Remembers everything it's painted
 4. **Anti-Repetition**: Actively avoids repeating itself
@@ -71,20 +73,19 @@ what matters is whether its work has coherence and meaning.
 
 ## Next Steps
 
-To add actual image generation:
-1. Get API access to Hugging Face
-2. Uncomment image generation code in `app.py`
-3. Or integrate with your preferred image API
+To render images:
+1. Create a Hugging Face token
+2. Copy `.env.example` to `.env` and set `HF_API_TOKEN`
+3. Run `python3 artist_cli.py --paint --generate`, or use the web app
 
-The prompt generation system is fully functional - it just needs
-to be connected to an image generator.
+Image generation is implemented in `utils.py` (`generate_image_api()`).
 
 ## Watch It Evolve
 
 Run it for 20+ paintings and you'll see:
 - Artistic "periods" emerge (like Picasso's blue period)
-- Genuine stylistic evolution
+- Stylistic evolution
 - Consistent creative trajectory
 - Personality shining through
 
-Enjoy your autonomous artist! 🎨
+

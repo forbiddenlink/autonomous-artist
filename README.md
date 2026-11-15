@@ -1,12 +1,12 @@
-# Autonomous Artist - An AI That Paints What It Feels
+# Autonomous Artist
 
 > **Successor project:** this work continued as [the-becoming](https://github.com/forbiddenlink/the-becoming). This repository is kept as the original version.
 
-An AI artist with genuine personality, evolving preferences, and autonomous decision-making. Watch as it develops its own artistic voice over time.
+A Python project in which a simulated artist has moods, preferences and a memory of its past work. It picks its own subjects, styles and palettes, builds an image prompt from that state, and can send the prompt to Hugging Face to render a picture. It is an experiment in artistic agency, not a product. There is no hosted instance.
 
-## What Makes This Special
+## What it does
 
-This isn't just an image generator - it's an **autonomous creative agent** that:
+The artist is a state machine that drives an image generator. It:
 
 - **Has moods** that influence its artistic choices (contemplative, chaotic, melancholic, energized, etc.)
 - **Develops preferences** over time based on what it's painted
@@ -15,11 +15,11 @@ This isn't just an image generator - it's an **autonomous creative agent** that:
 - **Reflects on its work** like a real artist would
 - **Maintains memory** of its artistic journey
 
-## How It Works
+## How it works
 
-### The Artist's Mind
+### The artist's state
 
-The artist has several interconnected systems that create emergent behavior:
+The artist keeps several linked pieces of state:
 
 #### 1. Emotional State
 - **Mood**: Current emotional state (contemplative, energized, melancholic, etc.)
@@ -70,12 +70,13 @@ Each artist instance develops its own unique voice:
 
 ## Installation
 
-```bash
-# Clone or download the project
-cd autonomous-artist
+Requires Python 3 (the `Dockerfile` uses Python 3.14).
 
-# Install dependencies
+```bash
+git clone https://github.com/forbiddenlink/autonomous-artist
+cd autonomous-artist
 pip install -r requirements.txt
+cp .env.example .env   # set HF_API_TOKEN to render images
 ```
 
 ## Usage
@@ -112,6 +113,9 @@ python3 artist_cli.py --portfolio
 # View current state
 python3 artist_cli.py --state
 
+# Also render images through Hugging Face (needs HF_API_TOKEN)
+python3 artist_cli.py --paint --generate
+
 # Create an artist with a different name
 python3 artist_cli.py --name "Vincent" --paint
 ```
@@ -122,7 +126,7 @@ python3 artist_cli.py --name "Vincent" --paint
 # Start the Flask server
 python3 app.py
 
-# Open browser to http://localhost:5000
+# Open http://localhost:5001 (the PORT setting; default 5001)
 ```
 
 The web interface provides:
@@ -139,13 +143,9 @@ python3 demo.py
 
 Shows a complete painting session with detailed explanations.
 
-## Image Generation
+## Image generation
 
-The system generates detailed prompts based on the artist's state. To actually generate images, you need:
-
-1. **Hugging Face Integration**: The system is designed to work with Hugging Face's FLUX.1-Krea-dev model
-2. **MCP Interface**: Full image generation works through Claude's MCP interface with the dynamic_space tool
-3. **Alternative**: You can integrate any image generation API by modifying the `generate_image()` function in `app.py`
+The system builds a detailed prompt from the artist's state. `generate_image_api()` in `utils.py` sends it to Hugging Face through `huggingface_hub.InferenceClient`. It needs `HF_API_TOKEN`. The default model is `black-forest-labs/FLUX.1-schnell` with `stabilityai/stable-diffusion-xl-base-1.0` as fallback (`IMAGE_MODEL` and `IMAGE_FALLBACK_MODEL` override them). Without a token the call returns an error and the web app records the painting with a placeholder image; the CLI only renders images when you pass `--generate`. To use another provider, replace `generate_image_api()`.
 
 ### Example Generated Prompt
 
@@ -161,15 +161,20 @@ professional photography, 8k uhd, high quality, masterpiece
 
 ```
 autonomous-artist/
-├── autonomous_artist.py   # Core artist AI with mood, memory, evolution
-├── app.py                 # Flask web application
+├── autonomous_artist.py   # AutonomousArtist: state, prompt generation, evolution
+├── artist_modules/        # brain, critic, memory, painter
+├── app.py                 # Flask web application and JSON API (see API.md)
 ├── artist_cli.py          # Command-line interface
-├── demo.py               # Demo script
-├── templates/
-│   └── index.html        # Web interface
-├── requirements.txt      # Python dependencies
-├── artist_memory.json    # Persistent artist state (auto-created)
-└── README.md            # This file
+├── utils.py               # Hugging Face image and vision calls, retries
+├── config.py              # Environment-driven settings
+├── cache_manager.py       # Response cache
+├── demo.py, showcase.py   # Demo scripts
+├── templates/index.html   # Web interface
+├── test_comprehensive.py  # pytest suite (also test_no_hardcoded_tokens.py)
+├── Dockerfile, docker-compose.yml, nginx.conf, deploy*.sh
+├── .env.example           # Environment variable names and defaults
+├── requirements.txt       # Python dependencies
+└── artist_memory.json     # Persistent artist state (auto-created)
 ```
 
 ## Artist Moods & Their Influence
@@ -188,6 +193,7 @@ Each mood affects the artist's choices differently:
 - **Rebellious**: Rule-breaking, aggressive contrasts
 - **Dreamy**: Ethereal, floating compositions
 - **Focused**: Clear, decisive, purposeful
+- **Whimsical**, **Gothic**, **Cyberpunk**, **Anxious**: also defined in `artist_modules/brain.py`
 
 ## Technical Details
 
@@ -195,7 +201,7 @@ Each mood affects the artist's choices differently:
 Artist state is automatically saved to `artist_memory.json` after each painting, including:
 - Current mood and energy
 - Style and subject preferences
-- Complete portfolio (last 50 paintings)
+- Portfolio (the last `MAX_PORTFOLIO_SIZE` paintings, default 50)
 - Theme history
 - Recent color usage
 
@@ -208,40 +214,21 @@ Preferences drift through:
 - Energy-dependent complexity
 
 ### Decision Making
-The artist uses weighted random selection based on:
-1. Current mood (30% influence)
-2. Learned preferences (50% influence)
-3. Random exploration (20% influence)
-4. Anti-repetition bias
+The artist uses weighted random selection. For style (`choose_style()`), 15% of picks are a random wildcard; otherwise it picks among the styles mapped to the current mood, weighted by its learned affinity plus a small mood boost. Subject and color choices also avoid recent repeats.
 
 ## Extending the System
 
 ### Add New Moods
-Edit `_generate_initial_mood()` in `autonomous_artist.py`:
-```python
-moods = [
-    "contemplative", "energized", "melancholic",
-    "your_new_mood_here"  # Add here
-]
-```
+Add the mood to `self.MOODS` in `artist_modules/brain.py`, then add it to `mood_style_map` in `choose_style()` so it maps to styles.
 
 ### Add New Styles
-Add to `style_affinities` in `__init__()`:
-```python
-self.style_affinities = {
-    "abstract": random.uniform(0, 1),
-    "your_new_style": random.uniform(0, 1),  # Add here
-}
-```
+Add an entry to the initial `style_affinities` dict in `autonomous_artist.py` (around line 70).
 
 ### Integrate Different Image APIs
-Modify `generate_image()` in `app.py` to call your preferred API.
+Modify `generate_image_api()` in `utils.py` to call your preferred API.
 
 ### Adjust Evolution Rate
-Change drift amounts in `evolve_state()`:
-```python
-drift = random.uniform(-0.05, 0.05)  # Adjust these values
-```
+Change the drift amounts in `evolve_state()` in `artist_modules/brain.py` (style affinities use `random.uniform(-0.05, 0.05)`).
 
 ## Example Session
 
@@ -285,23 +272,16 @@ The interesting part isn't whether it's "really" feeling anything, but whether t
 
 ## Future Enhancements
 
-Potential additions:
-- [ ] Visual analysis of its own work to inform future decisions
+Not built yet. Vision analysis of its own work (`analyze_image_api()`) and journal entries (`write_journal_entry()`) already exist.
+
 - [ ] Collaborative mode (responding to viewer feedback)
 - [ ] Multiple artist personalities that can interact
 - [ ] Learning from art history (feeding it museum collections)
-- [ ] "Dream journal" where it writes about its artistic process
 - [ ] Music composition based on visual mood
 - [ ] Gallery website with automatic updates
 
 ## License
 
-MIT License - Do whatever you want with this
-
-## Credits
-
-Created as an exploration of autonomous creative AI systems.
-
----
+MIT. See `LICENSE`.
 
 *"I'm not sure why I chose architecture, but it felt necessary."* - Aria
